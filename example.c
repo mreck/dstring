@@ -7,6 +7,7 @@
 #define FOO "foo"
 #define BAR "bar"
 #define BAZ "baz"
+#define SPACE "                                    "
 
 int main(void)
 {
@@ -30,6 +31,14 @@ int main(void)
     printf("s = |%s|\n", s.str);
 
     dstr_clear(&s);
+    printf("s = |%s|\n", s.str);
+
+    assert(dstr_append(&s, SPACE, 4) == DSTR_OK);
+    assert(dstr_append(&s, FOO, 3) == DSTR_OK);
+    assert(dstr_append(&s, SPACE, 4) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    dstr_trim(&s);
     printf("s = |%s|\n", s.str);
 
     dstr_free(&s);
