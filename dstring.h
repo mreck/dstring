@@ -18,9 +18,13 @@ int  dstr_resize(DString *dstr, int capacity);
 void dstr_free(DString *dstr);
 void dstr_clear(DString *dstr);
 int  dstr_append(DString *dstr, char *str, int len);
+int  dstr_append_printf(DString *dstr, char *fmt, ...);
 void dstr_trim(DString *dstr);
 void dstr_trim_left(DString *dstr);
 void dstr_trim_right(DString *dstr);
+int  dstr_index_of(DString dstr, char c);
+void dstr_replace(DString *dstr, char c, char replacement);
+void dstr_remove(DString *dstr, char c);
 
 #endif
 
@@ -29,6 +33,10 @@ void dstr_trim_right(DString *dstr);
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef DSTR_BUFFER_SIZE
+#define DSTR_BUFFER_SIZE 4096
+#endif
 
 #ifndef DSTR_REALLOC
 #define DSTR_REALLOC realloc
@@ -90,6 +98,16 @@ int dstr_append(DString *dstr, char *str, int len)
     return DSTR_OK;
 }
 
+int  dstr_append_printf(DString *dstr, char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    char buff[DSTR_BUFFER_SIZE];
+    int n = vsnprintf(buff, sizeof(buff), fmt, args);
+    va_end(args);
+    return dstr_append(dstr, buff, n);
+}
+
 void dstr_trim(DString *dstr)
 {
     dstr_trim_right(dstr);
@@ -109,7 +127,40 @@ void dstr_trim_left(DString *dstr)
 
 void dstr_trim_right(DString *dstr)
 {
-    while (dstr->length > 0 && isspace(dstr->str[dstr->length-1])) --dstr->length;
+    while (dstr->length > 0 && isspace(dstr->str[dstr->length-1])) {
+        --dstr->length;
+    }
+    dstr->str[dstr->length] = '\0';
+}
+
+int dstr_index_of(DString dstr, char c)
+{
+    for (int i = 0; i < dstr.length; i++) {
+        if (dstr.str[i] == c) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void dstr_replace(DString *dstr, char c, char replacement)
+{
+    for (int i = 0; i < dstr->length; i++) {
+        if (dstr->str[i] == c) {
+            dstr->str[i] = replacement;
+        }
+    }
+}
+
+void dstr_remove(DString *dstr, char c)
+{
+    int j = 0;
+    for (int i = 0; i < dstr->length; i++) {
+        if (dstr->str[i] != c) {
+            dstr->str[j++] = dstr->str[i];
+        }
+    }
+    dstr->length = j;
     dstr->str[dstr->length] = '\0';
 }
 
