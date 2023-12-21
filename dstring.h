@@ -26,6 +26,13 @@ int  dstr_index_of(DString dstr, char c);
 void dstr_replace(DString *dstr, char c, char replacement);
 void dstr_remove(DString *dstr, char c);
 
+int   dstr_path_append(DString *dstr, char *str, int len);
+int   dstr_path_append_printf(DString *dstr, char *fmt, ...);
+char *dstr_path_filename_get(DString dstr);
+int   dstr_path_filename_set(DString *dstr, char *str, int len);
+char *dstr_path_ext_get(DString dstr);
+int   dstr_path_ext_set(DString *dstr, char *str, int len);
+
 #endif
 
 #ifdef DSTRING_IMPLEMENTATION
@@ -36,6 +43,14 @@ void dstr_remove(DString *dstr, char c);
 
 #ifndef DSTR_BUFFER_SIZE
 #define DSTR_BUFFER_SIZE 4096
+#endif
+
+#ifndef DSTR_PATH_SEP
+#ifdef _WIN32
+#define DSTR_PATH_SEP '\\'
+#else
+#define DSTR_PATH_SEP '/'
+#endif
 #endif
 
 #ifndef DSTR_REALLOC
@@ -127,9 +142,7 @@ void dstr_trim_left(DString *dstr)
 
 void dstr_trim_right(DString *dstr)
 {
-    while (dstr->length > 0 && isspace(dstr->str[dstr->length-1])) {
-        --dstr->length;
-    }
+    while (dstr->length > 0 && isspace(dstr->str[dstr->length-1])) --dstr->length;
     dstr->str[dstr->length] = '\0';
 }
 
@@ -162,6 +175,64 @@ void dstr_remove(DString *dstr, char c)
     }
     dstr->length = j;
     dstr->str[dstr->length] = '\0';
+}
+
+int dstr_path_append(DString *dstr, char *str, int len)
+{
+    if (dstr->str[dstr->length-1] != DSTR_PATH_SEP) {
+        char buff[1] = { DSTR_PATH_SEP };
+        int retval = dstr_append(dstr, buff, 1);
+        if (retval != DSTR_OK) return retval;
+    }
+    return dstr_append(dstr, str, len);
+}
+
+int dstr_path_append_printf(DString *dstr, char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    char buff[DSTR_BUFFER_SIZE];
+    int n = vsnprintf(buff, sizeof(buff), fmt, args);
+    va_end(args);
+    return dstr_path_append(dstr, buff, n);
+}
+
+char *dstr_path_filename_get(DString dstr)
+{
+    char *end = dstr.str + dstr.length;
+    char *p = end - 1;
+    while (p >= dstr.str && *p != DSTR_PATH_SEP) --p;
+    ++p;
+    return p < end ? p : NULL;
+}
+
+int dstr_path_filename_set(DString *dstr, char *str, int len)
+{
+    char *p = dstr_path_filename_get(*dstr);
+    if (p != NULL) {
+        dstr->length = p - dstr->str;
+    }
+    return dstr_append(dstr, str, len);
+}
+
+char *dstr_path_ext_get(DString dstr)
+{
+    char *p = dstr.str + (dstr.length - 1);
+    while (p > dstr.str && *p != DSTR_PATH_SEP && *p != '.') --p;
+    return *p == '.' ? p : NULL;
+}
+
+int dstr_path_ext_set(DString *dstr, char *str, int len)
+{
+    char *p = dstr_path_ext_get(*dstr);
+    if (p != NULL) {
+        dstr->length = p - dstr->str;
+    }
+    if (len > 0 && *str != '.') {
+        int retval = dstr_append(dstr, ".", 1);
+        if (retval != DSTR_OK) return retval;
+    }
+    return dstr_append(dstr, str, len);
 }
 
 #endif

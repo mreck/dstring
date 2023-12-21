@@ -53,6 +53,28 @@ int main(void)
     assert(dstr_append_printf(&s, "%.*s %f", 2, SPACE, 3.14f) == DSTR_OK);
     printf("s = |%s|\n", s.str);
 
+    dstr_clear(&s);
+    assert(dstr_path_append(&s, FOO, 3) == DSTR_OK);
+    assert(dstr_path_append(&s, BAR, 3) == DSTR_OK);
+    assert(dstr_path_append(&s, BAZ, 3) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    assert(dstr_path_ext_set(&s, ".c", 2) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    assert(dstr_path_ext_set(&s, ".jpeg", 5) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    assert(dstr_path_filename_set(&s, "a.out", 5) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    dstr_clear(&s);
+    assert(dstr_path_filename_set(&s, "test", 4) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
+    assert(dstr_path_filename_set(&s, "a.out", 5) == DSTR_OK);
+    printf("s = |%s|\n", s.str);
+
     dstr_free(&s);
     dstr_free(&s);
 
