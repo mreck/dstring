@@ -4,6 +4,8 @@
 #ifndef DSTRING_H_
 #define DSTRING_H_
 
+#include <stdbool.h>
+
 #define DSTR_OK    0
 #define DSTR_ERROR 1
 
@@ -25,6 +27,8 @@ void dstr_trim_right(DString *dstr);
 int  dstr_index_of(DString dstr, char c);
 void dstr_replace(DString *dstr, char c, char replacement);
 void dstr_remove(DString *dstr, char c);
+bool dstr_contains(DString *dstr, char* str, int len);
+bool dstr_icontains(DString *dstr, char* str, int len);
 
 int   dstr_path_append(DString *dstr, char *str, int len);
 int   dstr_path_append_printf(DString *dstr, char *fmt, ...);
@@ -40,6 +44,7 @@ int   dstr_path_ext_set(DString *dstr, char *str, int len);
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #ifndef DSTR_BUFFER_SIZE
 #define DSTR_BUFFER_SIZE 4096
@@ -175,6 +180,24 @@ void dstr_remove(DString *dstr, char c)
     }
     dstr->length = j;
     dstr->str[dstr->length] = '\0';
+}
+
+bool dstr_contains(DString *dstr, char* str, int len)
+{
+    int d = dstr->length - len;
+    for (int i = 0; i <= d; i++) {
+        if (strncmp(dstr->str + i, str, len) == 0) return true;
+    }
+    return false;
+}
+
+bool dstr_icontains(DString *dstr, char* str, int len)
+{
+    int d = dstr->length - len;
+    for (int i = 0; i <= d; i++) {
+        if (strncasecmp(dstr->str + i, str, len) == 0) return true;
+    }
+    return false;
 }
 
 int dstr_path_append(DString *dstr, char *str, int len)

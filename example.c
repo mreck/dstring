@@ -75,6 +75,15 @@ int main(void)
     assert(dstr_path_filename_set(&s, "a.out", 5) == DSTR_OK);
     printf("s = |%s|\n", s.str);
 
+    dstr_clear(&s);
+    assert(dstr_append(&s, FOO, 3) == DSTR_OK);
+    assert(dstr_contains(&s, FOO, 3) == true);
+    assert(dstr_icontains(&s, "FOO", 3) == true);
+    assert(dstr_append(&s, BAR, 3) == DSTR_OK);
+    assert(dstr_append(&s, FOO, 3) == DSTR_OK);
+    assert(dstr_contains(&s, BAR, 3) == true);
+    assert(dstr_contains(&s, BAZ, 3) == false);
+
     dstr_free(&s);
     dstr_free(&s);
 
