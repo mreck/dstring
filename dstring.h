@@ -27,8 +27,8 @@ void dstr_trim_right(DString *dstr);
 int  dstr_index_of(DString dstr, char c);
 void dstr_replace(DString *dstr, char c, char replacement);
 void dstr_remove(DString *dstr, char c);
-bool dstr_contains(DString *dstr, char* str, int len);
-bool dstr_icontains(DString *dstr, char* str, int len);
+bool dstr_contains(DString *dstr, char *str, int len);
+bool dstr_icontains(DString *dstr, char *str, int len);
 
 int   dstr_path_append(DString *dstr, char *str, int len);
 int   dstr_path_append_printf(DString *dstr, char *fmt, ...);
@@ -182,7 +182,7 @@ void dstr_remove(DString *dstr, char c)
     dstr->str[dstr->length] = '\0';
 }
 
-bool dstr_contains(DString *dstr, char* str, int len)
+bool dstr_contains(DString *dstr, char *str, int len)
 {
     int d = dstr->length - len;
     for (int i = 0; i <= d; i++) {
@@ -191,7 +191,7 @@ bool dstr_contains(DString *dstr, char* str, int len)
     return false;
 }
 
-bool dstr_icontains(DString *dstr, char* str, int len)
+bool dstr_icontains(DString *dstr, char *str, int len)
 {
     int d = dstr->length - len;
     for (int i = 0; i <= d; i++) {
